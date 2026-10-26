@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voxora - AI Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#050816;--s1:rgba(17,23,46,.62);--s2:rgba(255,255,255,.06);--bd:rgba(255,255,255,.1);--tx:#e8ecf8;--mu:#8b94b3;--grid:rgba(255,255,255,.07);--sh:0 24px 60px -26px rgba(0,0,0,.85);--a:#22d3ee;--b:#a78bfa;--ad:color-mix(in srgb,var(--a) 55%,#000);--ag:color-mix(in srgb,var(--a) 50%,transparent)}
+[data-mode=light]{--bg:#e9eefa;--s1:rgba(255,255,255,.74);--s2:rgba(15,23,42,.05);--bd:rgba(15,23,42,.1);--tx:#0f172a;--mu:#5b6685;--grid:rgba(15,23,42,.08);--sh:0 24px 50px -28px rgba(30,41,90,.4)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{display:flex;flex-direction:column;height:100dvh;background:var(--bg);color:var(--tx);font:400 14.5px/1.6 "Plus Jakarta Sans","Noto Naskh Arabic",system-ui,sans-serif;transition:background .5s,color .4s;overflow:hidden}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.blob{position:absolute;width:48vmax;height:48vmax;border-radius:50%;filter:blur(90px);opacity:.28;animation:drift 18s ease-in-out infinite alternate}
+.b1{background:var(--a);top:-18vmax;left:-12vmax}.b2{background:var(--b);bottom:-20vmax;right:-14vmax;animation-delay:-9s}
+[data-mode=light] .blob{opacity:.22}
+.floor{position:absolute;left:-50%;right:-50%;bottom:-8%;height:55%;background:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px;transform:perspective(520px) rotateX(63deg);-webkit-mask-image:linear-gradient(to top,#000 5%,transparent 78%);mask-image:linear-gradient(to top,#000 5%,transparent 78%);animation:grid 5s linear infinite}
+@keyframes drift{to{transform:translate(8vmax,6vmax) scale(1.15)}}@keyframes grid{to{background-position:0 56px}}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 18px;background:var(--s1);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--bd);position:relative;z-index:30}
+.brand{display:flex;align-items:center;gap:12px}
+.cw{width:38px;height:38px;display:grid;place-items:center;perspective:220px}
+.cube{width:22px;height:22px;position:relative;transform-style:preserve-3d;animation:spin 9s linear infinite}
+.cube i{position:absolute;inset:0;border-radius:4px;border:1px solid rgba(255,255,255,.55);background:linear-gradient(135deg,var(--a),var(--b));opacity:.92}
+.cube i:nth-child(1){transform:translateZ(11px)}.cube i:nth-child(2){transform:rotateY(180deg) translateZ(11px)}.cube i:nth-child(3){transform:rotateY(90deg) translateZ(11px)}.cube i:nth-child(4){transform:rotateY(-90deg) translateZ(11px)}.cube i:nth-child(5){transform:rotateX(90deg) translateZ(11px)}.cube i:nth-child(6){transform:rotateX(-90deg) translateZ(11px)}
+@keyframes spin{from{transform:rotateX(-22deg) rotateY(0)}to{transform:rotateX(-22deg) rotateY(360deg)}}
+h1{font:800 20px/1 Sora,sans-serif;background:linear-gradient(90deg,var(--tx),var(--a));-webkit-background-clip:text;background-clip:text;color:transparent}
+.st{font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;margin-top:4px}
+.st b{width:7px;height:7px;border-radius:50%;background:#10b981;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #10b98188}70%{box-shadow:0 0 0 7px transparent}}
+.tools{display:flex;gap:8px;align-items:center;position:relative}
+.ib{height:38px;min-width:38px;padding:0 12px;border-radius:12px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);font:500 12.5px "Plus Jakarta Sans",sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}
+.ib:hover{transform:translateY(-2px);border-color:var(--a)}.ib:active{transform:translateY(1px)}
+select.ib{appearance:none;padding:0 10px;max-width:150px}select.ib option{color:#111}
+#tm{position:absolute;right:0;top:48px;width:236px;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:10px;border-radius:18px;background:var(--s1);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--bd);box-shadow:var(--sh);opacity:0;visibility:hidden;transform:perspective(500px) rotateX(-12deg) translateY(-8px);transform-origin:top;transition:.25s cubic-bezier(.2,.8,.2,1)}
+#tm.open{opacity:1;visibility:visible;transform:none}
+#tm button{display:flex;align-items:center;gap:8px;padding:8px;border:0;border-radius:10px;background:transparent;color:var(--tx);font:500 12px "Plus Jakarta Sans",sans-serif;cursor:pointer}
+#tm button:hover,#tm button.on{background:var(--s2)}#tm i{width:14px;height:14px;border-radius:50%}
+.wrap{flex:1;display:flex;min-height:0}
+aside{width:268px;flex:none;display:flex;flex-direction:column;gap:10px;padding:14px;background:var(--s1);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-right:1px solid var(--bd);transition:margin .35s cubic-bezier(.2,.8,.2,1),transform .35s cubic-bezier(.2,.8,.2,1);z-index:25}
+body.col aside{margin-left:-268px}
+.newc{height:44px;border:0;border-radius:14px;color:#fff;font:600 13.5px "Plus Jakarta Sans",sans-serif;background:linear-gradient(145deg,var(--b),var(--a));box-shadow:0 4px 0 var(--ad),0 14px 24px -10px var(--ag);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.newc:hover{transform:translateY(-2px)}.newc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ad)}
+#hist{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;scrollbar-width:thin}
+.hi{display:flex;align-items:center;gap:6px;padding:9px 10px;border-radius:11px;cursor:pointer;font-size:13px;color:var(--mu);transition:background .2s,color .2s}
+.hi span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hi:hover,.hi.on{background:var(--s2);color:var(--tx)}
+.hi button{background:none;border:0;color:var(--mu);cursor:pointer;opacity:0}.hi:hover button{opacity:1}
+.acct{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);font-size:12.5px}
+.acct .pic{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;color:#fff;font-weight:700;flex:none;background-size:cover}
+.acct .nm2{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lk{background:none;border:0;color:var(--a);cursor:pointer;font:600 12px inherit;font-family:inherit}
+.col2{flex:1;display:flex;flex-direction:column;min-width:0}
+main{flex:1;overflow-y:auto;padding:22px 16px;display:flex;flex-direction:column;gap:18px;max-width:880px;width:100%;margin:0 auto;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+#welcome{margin:auto 0;text-align:center;display:flex;flex-direction:column;align-items:center;padding:10px}
+.stage{width:150px;height:150px;position:relative;margin-bottom:34px;perspective:700px;transform-style:preserve-3d;transform:rotateX(calc(var(--my,0)*-12deg)) rotateY(calc(var(--mx,0)*14deg));transition:transform .25s ease-out}
+.orb{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.95),transparent 24%),radial-gradient(circle at 72% 80%,var(--b),transparent 60%),radial-gradient(circle,var(--a),var(--ad));box-shadow:inset -16px -20px 42px rgba(0,0,0,.45),0 34px 70px -14px var(--ag);animation:float 5s ease-in-out infinite}
+.ring{position:absolute;inset:-28px;border-radius:50%;border:2px solid var(--b);opacity:.55;transform:rotateX(74deg);animation:rs 8s linear infinite}
+.ring.r2{inset:-48px;border-color:var(--a);opacity:.28;animation-duration:13s;animation-direction:reverse}
+.shadow{position:absolute;left:18%;right:18%;bottom:-30px;height:16px;border-radius:50%;background:#000;opacity:.35;filter:blur(10px);animation:sh 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-14px)}}@keyframes rs{to{transform:rotateX(74deg) rotateZ(360deg)}}@keyframes sh{50%{transform:scale(.8);opacity:.2}}
+#welcome h2{font:800 clamp(30px,6vw,46px)/1.1 Sora,sans-serif;background:linear-gradient(90deg,var(--tx),var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+#welcome p{max-width:480px;color:var(--mu);margin:12px 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.chip{padding:10px 15px;border-radius:13px;background:var(--s1);border:1px solid var(--bd);color:var(--tx);font:500 13px "Plus Jakarta Sans",sans-serif;cursor:pointer;box-shadow:0 4px 0 var(--bd);transition:transform .15s,box-shadow .15s,border-color .2s}
+.chip:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--bd);border-color:var(--a)}.chip:active{transform:translateY(3px);box-shadow:0 1px 0 var(--bd)}
+.m{display:flex;gap:12px;align-items:flex-start;animation:pop .55s cubic-bezier(.2,.8,.2,1) both}.m.u{justify-content:flex-end}
+@keyframes pop{from{opacity:0;transform:perspective(700px) rotateX(14deg) translateY(18px) scale(.97)}}
+.av{width:34px;height:34px;border-radius:50%;flex:none;background:radial-gradient(circle at 32% 26%,#fff9,transparent 30%),radial-gradient(circle at 70% 80%,var(--b),transparent 60%),var(--a);box-shadow:inset -4px -5px 10px #0005,0 8px 18px -6px var(--ag)}
+.bub{padding:13px 16px;border-radius:18px;max-width:min(690px,88%);min-width:0;background:var(--s1);border:1px solid var(--bd);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.1);transition:transform .3s}
+.bub:hover{transform:translateY(-2px)}
+.u .bub{background:linear-gradient(135deg,var(--a),var(--b));color:#fff;border:0;box-shadow:0 16px 32px -14px var(--ag),inset 0 1px 0 rgba(255,255,255,.4)}
+.msg-body{word-break:break-word}.meta{margin-top:8px;font-size:10.5px;color:var(--mu)}.meta:empty{display:none}
+.fc{display:inline-flex;gap:6px;align-items:center;margin:0 6px 6px 0;padding:3px 10px;border-radius:999px;font-size:11.5px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25)}
+.bub img.gen,.bub img.th{display:block;max-width:100%;border-radius:12px;margin:8px 0;box-shadow:0 14px 30px -14px #000a}.bub img.th{max-height:150px}
+.dl{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--a);text-decoration:none;margin-top:2px}
+.dots span{display:inline-block;width:7px;height:7px;margin-right:5px;border-radius:50%;background:var(--a);animation:bn 1.2s infinite ease-in-out}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes bn{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
+.streaming::after{content:"▋";margin-left:2px;color:var(--a);animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
+.code-block{margin:9px 0;border-radius:12px;overflow:hidden;border:1px solid #1e2742;background:#070b1c;color:#e2e8f0}
+.code-head{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:#0d1330;font-size:11px;color:#94a3b8}
+.copy-btn{background:transparent;border:1px solid #334155;color:#cbd5e1;border-radius:8px;padding:2px 9px;font-size:11px;cursor:pointer}.copy-btn:hover{border-color:var(--a)}
+.code-block pre{margin:0;padding:12px;overflow-x:auto;font-size:12.5px;line-height:1.55}.code-block code{font-family:ui-monospace,Menlo,Consolas,monospace}
+.inline-code{background:var(--s2);border:1px solid var(--bd);padding:1px 6px;border-radius:6px;font:12.5px ui-monospace,Menlo,Consolas,monospace}
+footer{padding:8px 16px 14px;position:relative;z-index:10}
+#pf{display:flex;flex-wrap:wrap;gap:6px;max-width:820px;margin:0 auto 8px}
+#pf .fc{background:var(--s1);border-color:var(--bd);color:var(--tx);margin:0}#pf .fc button{background:none;border:0;color:var(--mu);cursor:pointer}
+.bar{display:flex;align-items:flex-end;gap:6px;max-width:820px;margin:0 auto;padding:8px;border-radius:22px;background:var(--s1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--bd);box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.08);transition:border-color .3s,box-shadow .3s}
+.bar:focus-within{border-color:var(--a);box-shadow:var(--sh),0 0 0 4px var(--ag)}
+.tg{width:40px;height:44px;border-radius:12px;border:0;background:transparent;color:var(--mu);cursor:pointer;transition:color .2s,background .2s,transform .15s}
+.tg:hover{color:var(--tx);background:var(--s2)}.tg.on{color:var(--a);background:var(--s2);box-shadow:inset 0 0 0 1px var(--a)}.tg:active{transform:scale(.92)}
+textarea{flex:1;background:transparent;border:0;outline:0;resize:none;color:var(--tx);font:inherit;padding:10px 8px;max-height:130px}textarea::placeholder{color:var(--mu)}
+.send{width:44px;height:44px;border-radius:14px;border:0;color:#fff;background:linear-gradient(145deg,var(--b),var(--a));box-shadow:0 4px 0 var(--ad),0 14px 24px -8px var(--ag);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.send:hover{transform:translateY(-2px)}.send:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ad),0 5px 10px -6px var(--ag)}
+.sig{display:flex;justify-content:center;margin-top:12px}
+.pill{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;font-size:12px;color:var(--mu);border:1px solid transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(90deg,var(--a),var(--b),var(--a)) border-box;background-size:auto,200% 100%;animation:bd 6s linear infinite;transition:transform .3s,box-shadow .3s}
+.pill:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 30px -14px var(--ag)}
+.nm{font:700 13px Sora,sans-serif;background:linear-gradient(90deg,var(--a),var(--b),var(--a));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:nm 4s linear infinite}
+.role{padding:2px 10px;border-radius:999px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);font-size:11px;display:inline-flex;gap:6px;align-items:center}
+@keyframes bd{to{background-position:0 0,200% 0}}@keyframes nm{to{background-position:200% 0}}
+#ov{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:rgba(2,4,14,.6);backdrop-filter:blur(8px);padding:16px}#ov.open{display:grid}
+.md{width:min(400px,100%);max-height:86vh;overflow:auto;padding:26px;border-radius:24px;background:var(--bg);border:1px solid var(--bd);box-shadow:var(--sh);animation:pop .45s cubic-bezier(.2,.8,.2,1) both;text-align:center}
+.md h3{font:800 22px Sora,sans-serif;margin-bottom:6px}.md p{color:var(--mu);font-size:13px;margin-bottom:16px}
+.md .chip{display:block;width:100%;margin-bottom:10px}.md .mi{display:flex;gap:8px;text-align:left;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}.md .mi span{flex:1}
+#toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);padding:10px 16px;border-radius:12px;background:var(--s1);backdrop-filter:blur(16px);border:1px solid var(--a);box-shadow:var(--sh);font-size:13px;opacity:0;pointer-events:none;transition:.3s;z-index:70;max-width:90vw;text-align:center}#toast.show{opacity:1;transform:translateX(-50%)}
+.src{margin-top:10px;font-size:12px;color:var(--mu)}.src a{color:var(--a);margin-right:10px;text-decoration:none}
+.inp{width:100%;padding:11px 13px;margin-bottom:10px;border-radius:12px;border:1px solid var(--bd);background:var(--s2);color:var(--tx);font:inherit;font-size:13px;outline:0}.inp:focus{border-color:var(--a)}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+@media(max-width:800px){.hide{display:none}header{padding:10px 12px}aside{position:fixed;left:0;top:0;bottom:0;margin-left:0!important;transform:translateX(-100%);background:var(--bg);width:min(290px,86vw)}body.sb aside{transform:none}}
+@media(prefers-reduced-motion:reduce){*,::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg"><i class="blob b1"></i><i class="blob b2"></i><div class="floor"></div></div>
+<header>
+  <div class="brand">
+    <button class="ib" aria-label="Toggle sidebar" onclick="toggleSide()"><i class="fa-solid fa-bars-staggered"></i></button>
+    <div class="cw"><div class="cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <div><h1>Voxora</h1><div class="st"><b></b><span id="model-label">Voxora</span> • Live streaming • Multilingual</div></div>
+  </div>
+  <div class="tools">
+    <select id="model-select" class="ib" aria-label="Model" onchange="onModelChange(this.value)">
+      <option value="gemini-3.5-flash-lite">⚡ Voxora Turbo</option>
+      <option value="gemini-3.5-flash">Voxora Pro</option>
+      <option value="auto">Auto-detect</option>
+    </select>
+    <button class="ib" aria-label="Themes" onclick="toggleThemeMenu(event)"><i class="fa-solid fa-palette" style="color:var(--a)"></i><span class="hide">Themes</span></button>
+    <button class="ib" aria-label="Dark or light mode" onclick="toggleMode()"><i id="mi" class="fa-solid fa-moon"></i></button>
+    <div id="tm"></div>
+  </div>
+</header>
+<div class="wrap">
+<aside>
+  <button class="newc" onclick="newChat();closeSideMobile()"><i class="fa-solid fa-plus"></i> New chat</button>
+  <div id="hist"></div>
+  <button class="ib" onclick="showMem()" style="justify-content:flex-start"><i class="fa-solid fa-brain" style="color:var(--a)"></i> Memory <span id="mc" style="margin-left:auto;color:var(--mu)">0</span></button>
+  <div class="acct"><div class="pic" id="pic">G</div><div class="nm2" id="an">Guest</div><button class="lk" id="ab" onclick="acctBtn()">Sign in</button></div>
+</aside>
+<div class="col2">
+<main id="chat-container">
+  <section id="welcome">
+    <div class="stage"><div class="ring r2"></div><div class="ring"></div><div class="orb"></div><div class="shadow"></div></div>
+    <h2>Voxora</h2>
+    <p>Hello! I'm Voxora. Ask me anything, chat in any language, upload a file or photo, or ask me to create an image.</p>
+    <div class="chips">
+      <button class="chip" onclick="quickAsk(this.textContent)">Explain Docker in simple words</button>
+      <button class="chip" onclick="quickAsk(this.textContent)">Write a Python REST API example</button>
+      <button class="chip" onclick="quickAsk(this.textContent)">Create an image of a futuristic city at sunset</button>
+      <button class="chip" onclick="quickAsk(this.textContent)">Translate to Urdu: Good morning</button>
+    </div>
+  </section>
+</main>
+<footer>
+  <div id="pf"></div>
+  <div class="bar">
+    <input type="file" id="fi" multiple hidden accept="image/*,application/pdf,text/*,.txt,.md,.csv,.json,.py,.js,.html,.yml,.yaml,.tf,.sh,.log,.xml">
+    <button class="tg" id="att" aria-label="Attach a file or photo" title="Attach a file or photo" onclick="document.getElementById('fi').click()"><i class="fa-solid fa-paperclip"></i></button>
+    <button class="tg" id="imb" aria-label="Create image mode" title="Create image mode" onclick="toggleImg()"><i class="fa-solid fa-image"></i></button>
+    <textarea id="user-input" rows="1" dir="auto" placeholder="Ask anything from Voxora..."></textarea>
+    <button id="send-btn" class="send" aria-label="Send" onclick="onSendClick()"><i id="send-icon" class="fa-solid fa-arrow-up"></i></button>
+  </div>
+  <div class="sig"><div class="pill"><span>Developed by</span><span class="nm" title="Muhammad Shehzal Abbas">Shehzal Abbas</span><span class="role"><i class="fa-solid fa-terminal"></i> DevOps &amp; Software Engineer</span></div></div>
+</footer>
+</div>
+</div>
+<div id="ov"><div class="md" id="mdb"></div></div>
+<div id="toast"></div>
+<script>
+/* ============ OWNER CONFIG (edit only this block) ============ */
+const CONFIG={
+  API_KEY:"",          // Gemini API key (restrict it to your website domain in Google AI Studio)
+  PROXY_URL:"",        // Optional: your own server/proxy URL that adds the key. If set, API_KEY is not needed.
+  API_KEYS:[],         // Optional: extra Gemini keys. When one hits its free limit, the next one is used automatically.
+  GOOGLE_CLIENT_ID:"", // Optional: enables "Continue with Google" (Gmail) - easiest setup, no Firebase needed.
+  FREE_CHAT:true,      // true = when the Gemini limit is reached (or there is no key) chat continues through a free service
+  FREE_IMAGES:true,    // true = images are generated for free first (no key needed)
+  FIREBASE:{apiKey:"",authDomain:"",projectId:"",appId:""}   // Optional: Google / Apple sign-in through Firebase
+};
+/* =============================================================== */
+const API_BASE=CONFIG.PROXY_URL||"https://generativelanguage.googleapis.com/v1beta",DEFAULT_MODEL="gemini-3.5-flash-lite",DEFAULT_IMG="gemini-3.1-flash-image",FIRST_BYTE_TIMEOUT=25000,IDLE_TIMEOUT=30000,MAX_HISTORY=10,FALLBACKS=["gemini-3.1-flash-lite","gemini-3.5-flash"];
+const FREE_CHAT=CONFIG.FREE_CHAT!==false,FREE_IMAGES=CONFIG.FREE_IMAGES!==false;
+const OWNER="OWNER INFORMATION (answer ONLY what is asked, in one short sentence, and never volunteer the other facts): Voxora was created and is owned by Muhammad Shehzal Abbas (also called Shehzal Abbas). Facts about him, to be revealed only when the user asks for that specific fact: (0) His full name / complete name / pura naam: Muhammad Shehzal Abbas. (1) Who he is / his profession: he is a DevOps Engineer and Software Engineer. (2) Where he studied: Gomal University. (3) What he studied: Software Engineering. (4) Where he is from or lives: he is from Pakistan and lives in Jhang Sadar, Punjab, Pakistan. (5) Caste: Malik Batra. (6) Father: Muhammad Asghar. (7) Mother: Iram Zulfiqar (The Most Beautiful Woman in the World). (8) Uncle / chacha / chacho: Muhammad Mazhar (The Guardian Angel Who Became Shehzal's Strength). (9) Sister: Hijab Zahra (The Most Beautiful Soul in Shehzal's World). (10) Brother: Shah Zain (The Little King of Shehzal's Heart). (11) Love / wife / girlfriend / partner: Maryam Zahra (The Queen of Shehzal's Heart, His Greatest Love, and His Forever Person ❤️💍). When you give a name that has text in brackets, include the bracketed text exactly as written. Only if the user asks for all details or everything, share all of the facts. Do not invent other personal details; if something is not listed, say that this information is not available.";
+const ACC="ACCURACY RULES: Never guess facts, numbers, distances or medicine details. For distances, routes and places, rely on the Google Maps data provided: give the distance in km, the approximate travel time, and say whether it is by road or straight-line. For medicines, rely on the search results from official or reputable sources (manufacturer label, health authorities, DailyMed, NHS, WHO, DRAP): give the generic and brand names, what it is used for, the dose exactly as those sources state it, warnings and interactions. Never invent a dose. End every medicine answer with: Please confirm the dose with a doctor or pharmacist. If sources conflict or nothing reliable is found, say so clearly instead of guessing.";
+const SYSTEM="You are Voxora, a fast, friendly multilingual AI assistant. Reply in the same language and script the user writes in (Roman Urdu gets Roman Urdu, Urdu script gets Urdu script, English gets English). In English, write with perfect spelling, grammar and punctuation. In Urdu, use correct, natural, standard Urdu with correct spelling and grammar. Be accurate, concise and direct; if you are unsure, say so instead of guessing. When the user attaches files or photos, read them carefully and answer strictly from their actual contents, mention specific details from them, and say clearly if something is not in the file. Put code inside fenced code blocks. If the user asks you to remember something, confirm in one short sentence that it is saved to memory. "+ACC+" "+OWNER;
+const ACCENTS=[["Aurora","#22d3ee","#a78bfa"],["Teal","#14b8a6","#38bdf8"],["Violet","#8b5cf6","#ec4899"],["Rose","#f43f5e","#fb923c"],["Amber","#f59e0b","#ef4444"],["Blue","#3b82f6","#22d3ee"],["Emerald","#10b981","#a3e635"],["Cyan","#06b6d4","#8b5cf6"],["Fuchsia","#d946ef","#6366f1"],["Sunset","#f97316","#f43f5e"],["Matrix","#22c55e","#14b8a6"],["Gold","#eab308","#f97316"]];
+const IMG_RE=/\b(generate|create|make|draw|design|render|paint|produce)\b[^.?!]{0,50}\b(image|picture|photo|pic|logo|poster|wallpaper|illustration|artwork|icon|portrait)\b|\b(image|picture|photo|tasveer|logo)\b[^.?!]{0,20}\b(bana|banao|bna|bnao|generate)/i;
+const MEM_RE=/^\s*(please\s+|plz\s+)?(remember|memori[sz]e)\b(?![^.]*\?)|\bsave\s+(this|that|it)\s+(in|to)\s+(my\s+|your\s+)?memory\b|\b(keep|add)\s+(this|that|it)\s+(in|to)\s+(my\s+|your\s+)?memory\b|\byaa?d\s*rakh|memory\s*(mein|me|main|mn)\s*(save|add|rakh)|memory\s*(save|add)\s*kar/i;
+const FORGET_RE=/\b(forget everything|clear (your |my )?memory|delete (your |my )?memory)\b|memory\s*(clear|delete|saaf)\s*kar|sab\s*bhool/i;
+const MAPS_RE=/\b(distance|how far|kilomet\w*|km|route|directions?|driving|travel time|nearest|near me|nearby|map|address of|fasla|doori|kitna door)\b|\bfrom\s.{2,40}\sto\s.{2,40}/i;
+const FACT_RE=/(medicine|medication|tablet|capsule|syrup|injection|dose|dosage|\bmg\b|drug|side effects?|symptom|treatment|disease|price|cost|latest|news|today|current|weather|score|result|who is|who was|when|where|how many|how much|population|capital|release|launch|law|2025|2026|dawa|dawai|ilaj|qeemat|khabar)/i;
+function pickTool(t,att){if(att.length||IMG_RE.test(t))return null;if(MAPS_RE.test(t))return{googleMaps:{}};if(FACT_RE.test(t))return{googleSearch:{}};return null}
+const KEYS=[CONFIG.API_KEY].concat(CONFIG.API_KEYS||[],[localStorage.getItem("gemini_api_key")]).filter(Boolean).filter((k,i,a)=>a.indexOf(k)===i);let kIdx=0,model=localStorage.getItem("shehzal_ai_model")||DEFAULT_MODEL,imgModel=localStorage.getItem("vx_img_model")||DEFAULT_IMG;
+let user=null,chats=[],cur=null,mem=[],files=[],imgMode=false,busy=false,controller=null,stuck=true,auth=null;
+const chat=document.getElementById("chat-container"),ta=document.getElementById("user-input"),root=document.documentElement,$=id=>document.getElementById(id);
+const brand=m=>m==="free"?"Voxora Free":/flash-lite/.test(m)?"Voxora Turbo":"Voxora Pro";
+const hasG=()=>KEYS.length>0||!!CONFIG.PROXY_URL,rotateKey=()=>{if(KEYS.length>1)kIdx=(kIdx+1)%KEYS.length};
+const hdr=()=>Object.assign({"Content-Type":"application/json"},KEYS.length?{"x-goog-api-key":KEYS[kIdx%KEYS.length]}:{});
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),3200)}
+
+/* theme + mode + parallax */
+function setAccent(n){const a=ACCENTS.find(x=>x[0]===n)||ACCENTS[0];root.style.setProperty("--a",a[1]);root.style.setProperty("--b",a[2]);localStorage.setItem("voxora_accent",a[0]);document.querySelectorAll("#tm button").forEach(b=>b.classList.toggle("on",b.dataset.n===a[0]))}
+function setMode(m){root.dataset.mode=m;localStorage.setItem("voxora_mode",m);$("mi").className="fa-solid "+(m==="dark"?"fa-moon":"fa-sun")}
+function toggleMode(){setMode(root.dataset.mode==="dark"?"light":"dark")}
+function toggleThemeMenu(e){e.stopPropagation();$("tm").classList.toggle("open")}
+addEventListener("click",()=>$("tm").classList.remove("open"));
+$("tm").innerHTML=ACCENTS.map(a=>'<button data-n="'+a[0]+'" onclick="setAccent(\''+a[0]+'\')"><i style="background:linear-gradient(135deg,'+a[1]+','+a[2]+')"></i>'+a[0]+"</button>").join("");
+setMode(localStorage.getItem("voxora_mode")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"));setAccent(localStorage.getItem("voxora_accent")||"Aurora");
+let pr=0;addEventListener("pointermove",e=>{if(pr)return;pr=requestAnimationFrame(()=>{pr=0;root.style.setProperty("--mx",(e.clientX/innerWidth-.5).toFixed(2));root.style.setProperty("--my",(e.clientY/innerHeight-.5).toFixed(2))})});
+function toggleSide(){document.body.classList.toggle(innerWidth<=800?"sb":"col")}
+function closeSideMobile(){document.body.classList.remove("sb")}
+
+/* model */
+function updateModelUI(){$("model-label").textContent=brand(model);const s=$("model-select");if(![...s.options].some(o=>o.value===model)){const o=document.createElement("option");o.value=model;o.textContent=brand(model);s.insertBefore(o,s.firstChild)}s.value=model}
+function setModel(n){model=n;localStorage.setItem("shehzal_ai_model",n);updateModelUI()}
+async function onModelChange(v){if(v==="auto"){try{const b=await findBest(/^models\/gemini-(\d+(?:\.\d+)?)-flash-lite$/)||await findBest(/^models\/gemini-(\d+(?:\.\d+)?)-flash$/);if(b){setModel(b);return}toast("Could not detect a model.")}catch(e){toast("Model detection failed: "+e.message)}updateModelUI()}else setModel(v)}
+updateModelUI();
+async function findBest(re,signal){const res=await fetch(API_BASE+"/models?pageSize=200",{signal:signal,headers:hdr()});if(!res.ok)throw await httpError(res);const d=await res.json();
+const r=(d.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>{const x=re.exec(m.name);return x?{n:m.name.replace("models/",""),v:parseFloat(x[1]||0)}:null}).filter(Boolean).sort((a,b)=>b.v-a.v)[0];return r?r.n:null}
+async function httpError(res){let msg="";try{const j=await res.json();msg=(j.error&&j.error.message)||""}catch(e){}let f=msg||("HTTP "+res.status);
+if(res.status===429)f="Rate limit or free quota reached. Please wait a minute and try again.";else if(res.status===400&&/api key/i.test(msg))f="The API key is invalid. The app owner needs to update it.";else if(res.status===403)f="Access denied (403). Check the API key, its restrictions, or your region. "+msg;else if(res.status===503)f="The server is busy right now (503). Please try again.";
+const e=new Error(f);e.status=res.status;return e}
+
+/* accounts + storage (separate data per account) */
+const K=s=>"vx:"+(user?user.uid:"guest")+":"+s;
+function load(){try{chats=JSON.parse(localStorage.getItem(K("chats"))||"[]")}catch(e){chats=[]}try{mem=JSON.parse(localStorage.getItem(K("mem"))||"[]")}catch(e){mem=[]}updMem();renderHist();newChat()}
+function save(){try{localStorage.setItem(K("chats"),JSON.stringify(chats.map(c=>({id:c.id,title:c.title,ts:c.ts,msgs:c.msgs.map(m=>({role:m.role,text:m.text,names:m.names,imgs:(m.imgs||[]).filter(i=>i.url).map(i=>({url:i.url}))}))}))))}catch(e){}}
+function saveMem(){try{localStorage.setItem(K("mem"),JSON.stringify(mem))}catch(e){}updMem()}
+function updMem(){$("mc").textContent=mem.length}
+function setUser(u){user=u;if(u)migrateGuest(u.uid);$("an").textContent=u?u.name:"Guest";$("ab").textContent=u?"Sign out":"Sign in";const p=$("pic");if(u&&u.photo){p.style.backgroundImage="url("+u.photo+")";p.textContent=""}else{p.style.backgroundImage="";p.textContent=(u?u.name:"G").charAt(0).toUpperCase()}load()}
+function ld(s){return new Promise((r,j)=>{const e=document.createElement("script");e.src=s;e.onload=r;e.onerror=j;document.head.appendChild(e)})}
+function getSession(){try{const s=JSON.parse(localStorage.getItem("vx:session")||"null");return s&&s.uid?s:null}catch(e){return null}}
+let gsiP=null;
+function loadGsi(){if(!CONFIG.GOOGLE_CLIENT_ID)return Promise.reject(new Error("no client id"));return gsiP||(gsiP=ld("https://accounts.google.com/gsi/client").then(()=>{google.accounts.id.initialize({client_id:CONFIG.GOOGLE_CLIENT_ID,callback:onGoogleCred})}).catch(e=>{gsiP=null;throw e}))}
+function onGoogleCred(r){try{const p=JSON.parse(decodeURIComponent(escape(atob(r.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")))));const s={uid:"g:"+p.sub,name:p.name||p.email||"User",email:p.email||"",photo:p.picture||"",provider:"google"};localStorage.setItem("vx:session",JSON.stringify(s));localStorage.removeItem("vx:guest");setUser(s);closeModal();toast("Signed in as "+s.name)}catch(e){toast("Google sign-in failed. Please try again.")}}
+function migrateGuest(uid){["chats","mem"].forEach(k=>{const a="vx:"+uid+":"+k,g="vx:guest:"+k;try{if(!localStorage.getItem(a)&&localStorage.getItem(g))localStorage.setItem(a,localStorage.getItem(g))}catch(e){}})}
+async function initAuth(){const F=CONFIG.FIREBASE;
+if(F&&F.apiKey){try{await ld("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");await ld("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js");firebase.initializeApp(F);auth=firebase.auth();
+auth.onAuthStateChanged(u=>{if(u){setUser({uid:u.uid,name:u.displayName||u.email||"User",photo:u.photoURL,provider:"firebase"});closeModal()}else{const s=getSession();if(s)setUser(s);else if(localStorage.getItem("vx:guest")){setUser(null)}else{setUser(null);showLogin()}}});return}catch(e){toast("Sign-in service could not load.")}}
+const s=getSession();if(s){setUser(s);return}
+setUser(null);if(!localStorage.getItem("vx:guest"))showLogin()}
+function showLogin(){let h='<h3>Welcome to Voxora</h3><p>Sign in to keep your chats and memory saved to your account.</p>';
+if(auth)h+='<button class="chip" onclick="signIn(\'google\')"><i class="fa-brands fa-google"></i> Continue with Google</button><button class="chip" onclick="signIn(\'apple\')"><i class="fa-brands fa-apple"></i> Continue with Apple</button>';
+else if(CONFIG.GOOGLE_CLIENT_ID)h+='<div id="gbtn" style="display:flex;justify-content:center;min-height:44px;margin-bottom:10px"></div>';
+h+='<button class="chip" onclick="showProfile()"><i class="fa-regular fa-user"></i> Continue with name &amp; email</button><button class="chip" onclick="guest()">Continue as guest</button>';
+$("mdb").innerHTML=h;$("ov").classList.add("open");
+if(!auth&&CONFIG.GOOGLE_CLIENT_ID)loadGsi().then(()=>google.accounts.id.renderButton($("gbtn"),{theme:"filled_blue",size:"large",shape:"pill",text:"continue_with",width:280})).catch(()=>{const g=$("gbtn");if(g)g.innerHTML='<p style="font-size:12px">Google sign-in could not load. Use name &amp; email instead.</p>'})}
+function showProfile(){$("mdb").innerHTML='<h3>Your profile</h3><p>Enter your name and email. Your chats and memory are saved under this profile on this device.</p><input class="inp" id="pn" placeholder="Your name" autocomplete="name"><input class="inp" id="pe" type="email" placeholder="Email (e.g. name@gmail.com)" autocomplete="email" onkeydown="if(event.key===\'Enter\')profileLogin()"><button class="chip" onclick="profileLogin()">Continue</button><button class="chip" onclick="showLogin()">Back</button>';$("ov").classList.add("open");setTimeout(()=>{const n=$("pn");if(n)n.focus()},60)}
+function profileLogin(){const n=$("pn").value.trim(),e=$("pe").value.trim().toLowerCase();if(!n){toast("Please enter your name.");return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){toast("Please enter a valid email.");return}const s={uid:"l:"+e,name:n.slice(0,40),email:e,photo:"",provider:"local"};localStorage.setItem("vx:session",JSON.stringify(s));localStorage.removeItem("vx:guest");setUser(s);closeModal()}
+function closeModal(){$("ov").classList.remove("open")}
+$("ov").addEventListener("click",e=>{if(e.target.id==="ov"&&(user||localStorage.getItem("vx:guest")))closeModal()});
+function guest(){localStorage.setItem("vx:guest","1");closeModal();if(user)setUser(null)}
+function signIn(k){if(!auth){toast("Sign-in is not set up yet.");return}const p=k==="google"?new firebase.auth.GoogleAuthProvider():new firebase.auth.OAuthProvider("apple.com");auth.signInWithPopup(p).catch(e=>{const c=e.code||"";if(/popup-blocked|operation-not-supported|web-storage-unsupported/.test(c))return auth.signInWithRedirect(p);if(c==="auth/unauthorized-domain")toast("This website's domain is not authorized in Firebase (Authentication > Settings > Authorized domains).");else if(c!=="auth/popup-closed-by-user"&&c!=="auth/cancelled-popup-request")toast(e.message)})}
+function acctBtn(){if(!user){showLogin();return}const fb=user.provider==="firebase";if(fb&&auth)auth.signOut();localStorage.removeItem("vx:session");localStorage.removeItem("vx:guest");try{google.accounts.id.disableAutoSelect()}catch(e){}if(!fb){setUser(null);showLogin()}}
+function showMem(){$("mdb").innerHTML='<h3>Memory</h3><p>Things Voxora remembers about you. Say "remember that..." (or "yaad rakho...") in chat, or add one below.</p><input class="inp" id="memin" maxlength="300" placeholder="e.g. My name is Ali, I live in Lahore" onkeydown="if(event.key===\'Enter\')addMem()"><button class="chip" onclick="addMem()"><i class="fa-solid fa-plus"></i> Save to memory</button>'+(mem.length?mem.map((m,i)=>'<div class="mi"><span>'+esc(m)+'</span><button class="lk" onclick="delMem('+i+')">Delete</button></div>').join("")+'<button class="chip" style="margin-top:14px" onclick="mem=[];saveMem();showMem()">Clear all</button>':'<p>Nothing saved yet.</p>')+'<button class="chip" style="margin-top:10px" onclick="closeModal()">Close</button>';$("ov").classList.add("open")}
+function addMem(){const i=$("memin"),v=i?i.value.trim():"";if(!v){toast("Type something to remember.");return}addMemory(v);showMem()}
+function addMemory(f){f=f.trim().slice(0,300);if(f.length<2||mem.some(x=>x.toLowerCase()===f.toLowerCase()))return false;mem.push(f);if(mem.length>50)mem.shift();saveMem();return true}
+function delMem(i){mem.splice(i,1);saveMem();showMem()}
+function remember(t){let f=t.trim().replace(/^(please|plz)\s+/i,"").replace(/^(remember|memori[sz]e)(\s+that)?\b[\s:,-]*/i,"").replace(/^yaa?d\s*rakh\w*(\s+(ke|ki|k|ye|yeh))?\b[\s:,-]*/i,"").replace(/[\s,]*\b(yaa?d\s*rakh\w*|(in\s+)?(my\s+)?memory\s*(mein|me|main|mn)?\s*(save|add)\s*(kar\w*|it|this)?)\s*[.!]*$/i,"").trim();if(!f)f=t.trim();if(addMemory(f))toast("Saved to memory ✓")}
+
+
+/* chats */
+function newChat(){if(busy&&controller)controller.abort("user");cur={id:Date.now()+"",title:"New chat",ts:Date.now(),msgs:[]};clearView();$("welcome").style.display="";renderHist()}
+function clearView(){[...chat.children].forEach(c=>{if(c.id!=="welcome")c.remove()})}
+function openChat(id){const c=chats.find(x=>x.id===id);if(!c)return;if(busy&&controller)controller.abort("user");cur=c;clearView();$("welcome").style.display="none";c.msgs.forEach(m=>{if(m.role==="user")addUserBubble(m.text,m.names,m.thumbs);else{const u=addAiBubble();u.body.innerHTML=renderMarkdown(m.text);(m.imgs||[]).forEach(i=>u.body.appendChild(imgEl(i)))}});scrollDown(true);renderHist();closeSideMobile()}
+function renderHist(){$("hist").innerHTML=chats.slice().sort((a,b)=>b.ts-a.ts).map(c=>'<div class="hi'+(cur&&cur.id===c.id?" on":"")+'" onclick="openChat(\''+c.id+'\')"><i class="fa-regular fa-message"></i><span>'+esc(c.title)+'</span><button aria-label="Delete chat" onclick="event.stopPropagation();delChat(\''+c.id+'\')"><i class="fa-solid fa-trash-can"></i></button></div>').join("")}
+function delChat(id){chats=chats.filter(c=>c.id!==id);save();if(cur&&cur.id===id)newChat();else renderHist()}
+
+/* input + files */
+ta.addEventListener("input",function(){this.style.height="auto";this.style.height=this.scrollHeight+"px"});
+ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(!busy)sendMessage()}});
+ta.addEventListener("paste",e=>{const f=[...(e.clipboardData&&e.clipboardData.files||[])];if(f.length){e.preventDefault();addFiles(f)}});
+$("fi").addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value=""});
+function toggleImg(){imgMode=!imgMode;$("imb").classList.toggle("on",imgMode);toast(imgMode?"Image mode on: describe the image you want":"Image mode off")}
+const TXT=/\.(txt|md|csv|json|log|py|js|ts|html|css|yml|yaml|sh|tf|xml)$/i;
+function readFile(f){return new Promise((res,rej)=>{const txt=/^text\/|json|xml/.test(f.type)||TXT.test(f.name),okb=txt||/^(image|audio|video)\//.test(f.type)||f.type==="application/pdf";
+if(!okb)return rej(new Error(f.name+" is not supported. Use images, PDF or text files."));if(f.size>15e6)return rej(new Error(f.name+" is too large (max 15 MB)."));
+const r=new FileReader();r.onerror=()=>rej(new Error("Could not read "+f.name));
+if(txt){r.onload=()=>res({name:f.name,part:{text:"[Attached file: "+f.name+"]\n"+String(r.result).slice(0,400000)}});r.readAsText(f)}
+else{r.onload=()=>{const u=r.result;res({name:f.name,thumb:f.type.startsWith("image/")?u:null,part:{inline_data:{mime_type:f.type,data:u.split(",")[1]}}})};r.readAsDataURL(f)}})}
+async function addFiles(fs){for(const f of fs){try{files.push(await readFile(f))}catch(e){toast(e.message)}}renderPending()}
+function renderPending(){$("pf").innerHTML=files.map((f,i)=>'<span class="fc"><i class="fa-solid fa-paperclip"></i>'+esc(f.name)+' <button aria-label="Remove file" onclick="files.splice('+i+',1);renderPending()">&times;</button></span>').join("")}
+function onSendClick(){if(busy){controller&&controller.abort("user")}else sendMessage()}
+function quickAsk(t){ta.value=t;sendMessage()}
+function setBusy(s){busy=s;$("send-icon").className=s?"fa-solid fa-stop":"fa-solid fa-arrow-up"}
+chat.addEventListener("scroll",()=>{stuck=chat.scrollHeight-chat.scrollTop-chat.clientHeight<140});
+function scrollDown(f){if(f||stuck)chat.scrollTop=chat.scrollHeight}
+
+/* rendering */
+function renderMarkdown(text){const blocks=[];let t=text.replace(/```(\w*)\n?([\s\S]*?)(```|$)/g,function(m,lang,code){blocks.push('<div class="code-block"><div class="code-head"><span>'+esc(lang||"code")+'</span><button class="copy-btn" type="button">Copy</button></div><pre><code>'+esc(code.replace(/\n$/,""))+"</code></pre></div>");return "\u0000"+(blocks.length-1)+"\u0000"});
+t=esc(t).replace(/`([^`\n]+)`/g,'<code class="inline-code">$1</code>').replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>").replace(/^#{1,3}\s+(.+)$/gm,'<strong style="display:block;margin-top:6px">$1</strong>').replace(/^\s*[-*]\s+(.+)$/gm,'<span style="display:block;padding-left:16px">&bull; $1</span>').replace(/\n/g,"<br>").replace(/<\/span><br>/g,"</span>").replace(/<\/strong><br>/g,"</strong>");
+return t.replace(/\u0000(\d+)\u0000(<br>)?/g,(m,i)=>blocks[i])}
+chat.addEventListener("click",function(e){const b=e.target.closest(".copy-btn");if(!b)return;navigator.clipboard.writeText(b.closest(".code-block").querySelector("pre").textContent).then(()=>{b.textContent="Copied!";setTimeout(()=>b.textContent="Copy",1500)})});
+function addUserBubble(text,names,thumbs){const w=document.createElement("div");w.className="m u";w.innerHTML='<div class="bub msg-body" dir="auto"></div>';const b=w.firstChild;(thumbs||[]).forEach(s=>{const i=document.createElement("img");i.className="th";i.src=s;b.appendChild(i)});(names||[]).forEach(n=>{const s=document.createElement("span");s.className="fc";s.innerHTML='<i class="fa-solid fa-paperclip"></i>'+esc(n);b.appendChild(s)});if(text){const d=document.createElement("div");d.textContent=text;b.appendChild(d)}chat.appendChild(w);scrollDown(true)}
+function addAiBubble(){const w=document.createElement("div");w.className="m";w.innerHTML='<div class="av"></div><div class="bub"><div class="msg-body" dir="auto"><span class="dots"><span></span><span></span><span></span></span></div><div class="meta"></div></div>';chat.appendChild(w);scrollDown(true);return{body:w.querySelector(".msg-body"),meta:w.querySelector(".meta")}}
+function imgEl(i){const d=document.createElement("div");if(i.url){const u=esc(i.url);d.innerHTML='<img class="gen" alt="Generated image" src="'+u+'"><a class="dl" href="'+u+'" target="_blank" rel="noopener" onclick="dlImg(this.href,event)"><i class="fa-solid fa-download"></i> Download</a>';return d}
+const src="data:"+i.mime+";base64,"+i.data;d.innerHTML='<img class="gen" alt="Generated image" src="'+src+'"><a class="dl" download="voxora-image.png" href="'+src+'"><i class="fa-solid fa-download"></i> Download</a>';return d}
+
+/* build request contents */
+function buildContents(){let ms=cur.msgs.slice(-MAX_HISTORY);while(ms.length&&ms[0].role!=="user")ms.shift();
+return ms.map(m=>({role:m.role,parts:(m.parts||[]).concat([{text:m.text||(m.imgs?"[image generated]":"(empty)")}])}))}
+function sysText(){return SYSTEM+(mem.length?"\n\nSaved memories about this user (use them when relevant):\n- "+mem.join("\n- "):"")}
+
+/* free services (no key needed) */
+function freeImage(prompt,signal){return new Promise((res,rej)=>{const u="https://image.pollinations.ai/prompt/"+encodeURIComponent(prompt.slice(0,800))+"?width=1024&height=1024&nologo=true&model=flux&seed="+Math.floor(Math.random()*1e9);const im=new Image();const t=setTimeout(()=>{im.onload=im.onerror=null;im.src="";rej(new Error("timeout"))},60000);im.onload=()=>{clearTimeout(t);res(u)};im.onerror=()=>{clearTimeout(t);rej(new Error("failed"))};if(signal)signal.addEventListener("abort",()=>{clearTimeout(t);im.onload=im.onerror=null;im.src="";rej(new Error("aborted"))},{once:true});im.src=u})}
+function buildFreeMsgs(){let ms=cur.msgs.slice(-MAX_HISTORY);while(ms.length&&ms[0].role!=="user")ms.shift();
+return [{role:"system",content:sysText()}].concat(ms.map(m=>{const ps=m.parts||[];let c=ps.map(p=>p.text||"").filter(Boolean).join("\n\n");if(ps.some(p=>p.inline_data))c+="\n[An attached image/PDF could not be read in free mode]";c=(c+"\n\n"+(m.text||(m.imgs&&m.imgs.length?"[image generated]":""))).trim();return{role:m.role==="model"?"assistant":"user",content:c||"(empty)"}}))}
+async function freeChat(signal){const r=await fetch("https://text.pollinations.ai/openai",{method:"POST",signal:signal,headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"openai",messages:buildFreeMsgs(),temperature:.3})});
+if(!r.ok)throw new Error("The free service is busy ("+r.status+"). Please try again in a moment.");const j=await r.json();return(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||""}
+async function dlImg(u,ev){ev.preventDefault();try{const b=await(await fetch(u)).blob();const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="voxora-image.png";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}catch(e){window.open(u,"_blank","noopener")}}
+
+/* send flow */
+async function sendMessage(){
+const text=ta.value.trim();if((!text&&!files.length)||busy)return;
+if(!hasG()&&!FREE_CHAT&&!FREE_IMAGES){toast("Voxora is not configured yet. The owner needs to add the API key in the CONFIG block.");return}
+if(FORGET_RE.test(text)){mem=[];saveMem();toast("Memory cleared")}else if(MEM_RE.test(text))remember(text);
+const wantImg=imgMode||IMG_RE.test(text),att=files;files=[];renderPending();if(imgMode){imgMode=false;$("imb").classList.remove("on")}
+const msg={role:"user",text:text,names:att.map(f=>f.name),parts:att.map(f=>f.part),thumbs:att.filter(f=>f.thumb).map(f=>f.thumb)};
+$("welcome").style.display="none";addUserBubble(text,msg.names,msg.thumbs);ta.value="";ta.style.height="auto";
+cur.msgs.push(msg);if(cur.msgs.length===1){cur.title=(text||msg.names[0]||"New chat").slice(0,40);cur.ts=Date.now();chats.unshift(cur)}renderHist();
+const ui=addAiBubble();setBusy(true);controller=new AbortController();const signal=controller.signal;
+let timer;const arm=ms=>{clearTimeout(timer);timer=setTimeout(()=>controller.abort("timeout"),ms)};
+const t0=performance.now();let tFirst=null,full="",imgs=[],ok=false,raf=null,srcs=[],used=model,grounded=false,tool=wantImg?null:pickTool(text,att);
+const paint=fin=>{if(raf&&!fin)return;raf=requestAnimationFrame(()=>{raf=null;ui.body.innerHTML=renderMarkdown(full);imgs.forEach(i=>ui.body.appendChild(imgEl(i)));ui.body.classList.toggle("streaming",!fin);if(fin&&srcs.length){const d=document.createElement("div");d.className="src";d.innerHTML="Sources: "+srcs.slice(0,5).map(x=>'<a target="_blank" rel="noopener" href="'+esc(x.uri)+'">'+esc(x.title)+"</a>").join("");ui.body.appendChild(d)}scrollDown()})};
+try{
+if(wantImg){arm(150000);let done=false;
+if(FREE_IMAGES){for(let a=0;a<2&&!done;a++){try{imgs.push({url:await freeImage(text||"Create an image",signal)});used="free";done=true}catch(e){if(signal.aborted)throw e}}}
+if(!done){
+if(!hasG())throw new Error("The free image service is busy right now. Please try again in a minute.");
+const body=JSON.stringify({contents:[{role:"user",parts:(msg.parts||[]).concat([{text:text||"Create an image"}])}],generationConfig:{responseModalities:["TEXT","IMAGE"]}});
+const call=()=>fetch(API_BASE+"/models/"+imgModel+":generateContent",{method:"POST",signal:signal,headers:hdr(),body:body});
+const callRot=async()=>{let r;for(let i=0;i<Math.max(1,KEYS.length);i++){r=await call();if(r.status!==429)return r;rotateKey()}return r};
+let res=await callRot();
+if(res.status===404){const b=await findBest(/^models\/gemini-(\d+(?:\.\d+)?)-flash-image$/,signal)||await findBest(/^models\/gemini-(\d+(?:\.\d+)?)-[a-z0-9.-]*image[a-z0-9.-]*$/,signal);if(b){imgModel=b;localStorage.setItem("vx_img_model",b);res=await callRot()}}
+if(!res.ok){const e=await httpError(res);if(res.status===429||res.status===403)e.message+=" Image generation may need a paid API plan.";throw e}
+const d=await res.json(),parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+for(const p of parts){const idt=p.inlineData||p.inline_data;if(idt)imgs.push({mime:idt.mimeType||idt.mime_type||"image/png",data:idt.data});else if(p.text&&!p.thought)full+=p.text}
+if(!imgs.length&&!full)full=(d.promptFeedback&&d.promptFeedback.blockReason)?"This image request was blocked by the safety filter.":"No image was returned. Please try a different description."}
+ok=true;paint(true)}
+else{
+let useFree=FREE_CHAT&&!hasG(),res=null;
+if(!useFree){
+const call=(m,t)=>{arm(FIRST_BYTE_TIMEOUT);return fetch(API_BASE+"/models/"+m+":streamGenerateContent?alt=sse",{method:"POST",signal:signal,headers:hdr(),body:JSON.stringify(Object.assign({system_instruction:{parts:[{text:sysText()}]},contents:buildContents(),generationConfig:{temperature:.3,maxOutputTokens:2048}},t?{tools:[t]}:{}))})};
+const callRot=async(m,t)=>{let r;for(let i=0;i<Math.max(1,KEYS.length);i++){r=await call(m,t);if(r.status!==429)return r;rotateKey()}return r};
+const chain=[model].concat(FALLBACKS.filter(m=>m!==model));
+try{
+outer:for(const m of chain){for(const t of(tool?[tool,null]:[null])){res=await callRot(m,t);if(res.status!==429){used=m;grounded=!!t;break outer}}}
+if(res.status===404){const b=await findBest(/^models\/gemini-(\d+(?:\.\d+)?)-flash-lite$/,signal);if(b&&b!==model){setModel(b);res=await callRot(b,tool);used=b;grounded=!!tool}}
+}catch(e){if(signal.aborted||!FREE_CHAT)throw e;useFree=true}
+if(!useFree&&!res.ok&&FREE_CHAT&&[401,403,429,500,502,503].includes(res.status))useFree=true}
+if(useFree){used="free";grounded=false;arm(60000);full=await freeChat(signal);tFirst=performance.now();if(!full)throw new Error("No response received. Please try again.");ok=true;paint(true)}
+else{
+if(!res.ok)throw await httpError(res);
+const reader=res.body.getReader(),dec=new TextDecoder();let buf="",blocked="";
+while(true){const c=await reader.read();if(c.done)break;arm(IDLE_TIMEOUT);buf+=dec.decode(c.value,{stream:true});let i;
+while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith("data:"))continue;const js=line.slice(5).trim();if(!js||js==="[DONE]")continue;let o;try{o=JSON.parse(js)}catch(e){continue}
+if(o.error)throw new Error(o.error.message||"API error");if(o.promptFeedback&&o.promptFeedback.blockReason)blocked=o.promptFeedback.blockReason;const gm=o.candidates&&o.candidates[0]&&o.candidates[0].groundingMetadata;if(gm&&gm.groundingChunks)gm.groundingChunks.forEach(c=>{const x=c.web||c.maps;if(x&&/^https?:/.test(x.uri||"")&&!srcs.some(y=>y.uri===x.uri))srcs.push({uri:x.uri,title:x.title||x.uri})});
+const parts=o.candidates&&o.candidates[0]&&o.candidates[0].content&&o.candidates[0].content.parts;
+if(parts){for(const p of parts){if(p.text&&!p.thought){if(tFirst===null)tFirst=performance.now();full+=p.text}}paint(false)}}}
+if(!full)full=blocked?"This request was blocked by the safety filter ("+blocked+").":"No response received. Please try again.";else ok=true;paint(true)}
+}
+}catch(error){const reason=signal.aborted?signal.reason:null;
+if(reason==="user"){full=full?full+"\n\n_(stopped)_":"_(stopped)_";ok=!!full.replace("_(stopped)_","").trim()}
+else if(reason==="timeout"){full=(full?full+"\n\n":"")+"Timeout: no response was received. Please check your internet connection and try again."}
+else{ui.body.style.color="#fb7185";full="Error: "+error.message}paint(true)
+}finally{clearTimeout(timer);setBusy(false);controller=null}
+if(ok){const clean=full.replace(/\n\n_\(stopped\)_$/,"");cur.msgs.push({role:"model",text:clean,imgs:imgs});save();const tot=((performance.now()-t0)/1000).toFixed(1);ui.meta.textContent=imgs.length?"Created in "+tot+"s"+(used==="free"?" • Voxora Free":""):"⚡ first word "+(tFirst?((tFirst-t0)/1000).toFixed(1):"-")+"s • total "+tot+"s • "+brand(used)+(grounded?" • verified with "+(tool.googleMaps?"Google Maps":"Google Search"):"")}
+else{cur.msgs.pop();if(!cur.msgs.length){chats=chats.filter(c=>c!==cur);renderHist()}}
+scrollDown();ta.focus()}
+initAuth();
+</script>
+</body>
+</html>
